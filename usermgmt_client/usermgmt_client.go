@@ -29,10 +29,10 @@ func main() {
 
 	var new_users = make(map[string]int32)
 
-	new_users["Bruno Istvan"] = 38
-	new_users["Letícia Monteiro"] = 8
-	new_users["Nathana Monteiro"] = 29
-	new_users["Sonia Campos"] = 66
+	new_users["User 1"] = 38
+	new_users["User 2"] = 8
+	new_users["User 3"] = 29
+	new_users["User 4"] = 66
 
 	for name, age := range new_users {
 
