@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserManagementClient interface {
 	CreateNewUser(ctx context.Context, in *NewUser, opts ...grpc.CallOption) (*User, error)
-	GetUsers(ctx context.Context, in *GetUserParams, opts ...grpc.CallOption) (*UserList, error)
+	GetUsers(ctx context.Context, in *GetUserParams, opts ...grpc.CallOption) (*UsersList, error)
 }
 
 type userManagementClient struct {
@@ -43,8 +43,8 @@ func (c *userManagementClient) CreateNewUser(ctx context.Context, in *NewUser, o
 	return out, nil
 }
 
-func (c *userManagementClient) GetUsers(ctx context.Context, in *GetUserParams, opts ...grpc.CallOption) (*UserList, error) {
-	out := new(UserList)
+func (c *userManagementClient) GetUsers(ctx context.Context, in *GetUserParams, opts ...grpc.CallOption) (*UsersList, error) {
+	out := new(UsersList)
 	err := c.cc.Invoke(ctx, "/usermgmt.UserManagement/GetUsers", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (c *userManagementClient) GetUsers(ctx context.Context, in *GetUserParams, 
 // for forward compatibility
 type UserManagementServer interface {
 	CreateNewUser(context.Context, *NewUser) (*User, error)
-	GetUsers(context.Context, *GetUserParams) (*UserList, error)
+	GetUsers(context.Context, *GetUserParams) (*UsersList, error)
 	mustEmbedUnimplementedUserManagementServer()
 }
 
@@ -68,7 +68,7 @@ type UnimplementedUserManagementServer struct {
 func (UnimplementedUserManagementServer) CreateNewUser(context.Context, *NewUser) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateNewUser not implemented")
 }
-func (UnimplementedUserManagementServer) GetUsers(context.Context, *GetUserParams) (*UserList, error) {
+func (UnimplementedUserManagementServer) GetUsers(context.Context, *GetUserParams) (*UsersList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsers not implemented")
 }
 func (UnimplementedUserManagementServer) mustEmbedUnimplementedUserManagementServer() {}

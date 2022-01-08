@@ -2,26 +2,30 @@ package main
 
 import (
 	"context"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net"
+	"os"
 
 	pb "github.com/BrunoIstvan/grpc-user-management-go/usermgmt"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 const (
-	port = ":50051"
+	port      = ":50051"
+	user_file = "user.json"
 )
 
 type UserManagementServer struct {
 	pb.UnimplementedUserManagementServer
-	user_list *pb.UserList
+	// user_list *pb.UserList
 }
 
 func NewUserManagementServer() *UserManagementServer {
 	return &UserManagementServer{
-		user_list: &pb.UserList{},
+		// user_list: &pb.UserList{},
 	}
 }
 
@@ -45,6 +49,10 @@ func (serv *UserManagementServer) CreateNewUser(ctx context.Context, in *pb.NewU
 
 	log.Printf("Receive: %v", in.GetName())
 
+	readBytes, err := ioutil.ReadFile(user_file)
+
+	var users_list *pb.UsersList = &pb.UsersList{}
+
 	var user_id int32 = int32(rand.Intn(1000))
 
 	created_user := &pb.User{
@@ -53,15 +61,80 @@ func (serv *UserManagementServer) CreateNewUser(ctx context.Context, in *pb.NewU
 		Id:   user_id,
 	}
 
-	serv.user_list.Users = append(serv.user_list.Users, created_user)
+	if err != nil {
+
+		if os.IsNotExist(err) {
+			log.Print("File not found. Creating a new file")
+
+			users_list.Users = append(users_list.Users, created_user)
+
+			// jsonBytes, err := protojson.Marshal(users_list)
+
+			// if err != nil {
+			// 	log.Fatalf("JSON Marshaling failed: %v", err)
+			// }
+
+			// if err := ioutil.WriteFile(user_file, jsonBytes, 0664); err != nil {
+			// 	log.Fatalf("Failed write to file: %v", err)
+			// }
+
+			marshalAndWriteFile(users_list)
+
+			return created_user, nil
+
+		} else {
+			log.Fatalln("Error reading file: %v", err)
+		}
+
+	}
+
+	if err := protojson.Unmarshal(readBytes, users_list); err != nil {
+		log.Fatalf("Unmarshaling failed: %v", err)
+	}
+	users_list.Users = append(users_list.Users, created_user)
+
+	// jsonBytes, err := protojson.Marshal(users_list)
+
+	// if err != nil {
+	// 	log.Fatalf("JSON Marshaling failed: %v", err)
+	// }
+
+	// if err := ioutil.WriteFile(user_file, jsonBytes, 0664); err != nil {
+	// 	log.Fatalf("Failed write to file: %v", err)
+	// }
+
+	marshalAndWriteFile(users_list)
 
 	return created_user, nil
 
 }
 
-func (serv *UserManagementServer) GetUsers(ctx context.Context, in *pb.GetUserParams) (*pb.UserList, error) {
+func marshalAndWriteFile(users_list *pb.UsersList) {
+	jsonBytes, err := protojson.Marshal(users_list)
 
-	return serv.user_list, nil
+	if err != nil {
+		log.Fatalf("JSON Marshaling failed: %v", err)
+	}
+
+	if err := ioutil.WriteFile(user_file, jsonBytes, 0664); err != nil {
+		log.Fatalf("Failed write to file: %v", err)
+	}
+}
+
+func (serv *UserManagementServer) GetUsers(ctx context.Context, in *pb.GetUserParams) (*pb.UsersList, error) {
+
+	jsonBytes, err := ioutil.ReadFile(user_file)
+	if err != nil {
+		log.Fatalf("Failed read from file: %v", err)
+	}
+
+	var users_list *pb.UsersList = &pb.UsersList{}
+
+	if err := protojson.Unmarshal(jsonBytes, users_list); err != nil {
+		log.Fatalf("Unmarshaling failed: %v", err)
+	}
+
+	return users_list, nil
 
 }
 
