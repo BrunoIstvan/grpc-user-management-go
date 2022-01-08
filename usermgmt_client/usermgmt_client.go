@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -44,5 +45,15 @@ func main() {
 		log.Printf(`User Details: [Name: %s, Age: %d, Id: %d]`, resp.GetName(), resp.GetAge(), resp.GetId())
 
 	}
+
+	params := &pb.GetUserParams{}
+
+	resp, err := client.GetUsers(ctx, params)
+	if err != nil {
+		log.Fatalf("Could not retrieve users: %v", err)
+	}
+
+	log.Print("\nUser List: \n")
+	fmt.Printf("resp.GetUsers(): %v\n", resp.GetUsers())
 
 }

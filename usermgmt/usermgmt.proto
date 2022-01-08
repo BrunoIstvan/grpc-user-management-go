@@ -8,6 +8,8 @@ service UserManagement {
 
     rpc CreateNewUser(NewUser) returns (User) {}
 
+    rpc GetUsers(GetUserParams) returns (UserList) {}
+
 }
 
 message NewUser {
@@ -21,4 +23,14 @@ message User {
     int32 id = 3;
 }
 
+message GetUserParams {
 
+
+
+}
+
+message UserList {
+
+    repeated User users = 1;
+
+}
