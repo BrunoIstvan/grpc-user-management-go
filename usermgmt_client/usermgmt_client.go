@@ -48,7 +48,7 @@ func main() {
 
 	params := &pb.GetUserParams{}
 
-	resp, err := client.GetUsers(ctx, params)
+	resp, err := client.GetAllUsers(ctx, params)
 	if err != nil {
 		log.Fatalf("Could not retrieve users: %v", err)
 	}

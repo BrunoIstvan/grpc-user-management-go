@@ -8,7 +8,13 @@ service UserManagement {
 
     rpc CreateNewUser(NewUser) returns (User) {}
 
-    rpc GetUsers(GetUserParams) returns (UsersList) {}
+    rpc UpdateUser(User) returns (Message) {}
+
+    rpc DeleteUser(Number) returns (Message) {}
+
+    rpc GetAllUsers(GetUserParams) returns (UsersList) {}
+
+    rpc GetUserById(Number) returns (User) {}
 
 }
 
@@ -22,6 +28,15 @@ message User {
     int32 age = 2;
     int32 id = 3;
 }
+
+message Number {
+    int32 id = 1;
+}
+
+message Message {
+    string content = 1;
+}
+
 
 message GetUserParams {
 
